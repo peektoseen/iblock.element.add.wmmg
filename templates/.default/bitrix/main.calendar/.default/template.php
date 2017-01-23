@@ -14,13 +14,13 @@ for ($i = 0; $i < $cnt; $i++):
 
     <div class="line_row_w33 fr" onclick="BX.calendar({node:this, field:'<?= htmlspecialcharsbx(CUtil::JSEscape($arParams['INPUT_NAME' . ($i == 1 ? '_FINISH' : '')])) ?>', form: '<? if ($arParams['FORM_NAME'] != '') {
         echo htmlspecialcharsbx(CUtil::JSEscape($arParams['FORM_NAME']));
-    } ?>', bTime: <?= $arParams['SHOW_TIME'] == 'Y' ? 'true' : 'false' ?>, currentTime: '<?= (time() + date("Z") + CTimeZone::GetOffset()) ?>', bHideTime: <?= $arParams['HIDE_TIMEBAR'] == 'Y' ? 'true' : 'false' ?>});"
+    } ?>', bTime: <?= $arParams['SHOW_TIME'] == 'Y' ? 'true' : 'false' ?>, currentTime: '<?= (time() + date("Z") + CTimeZone::GetOffset()) ?>', bHideTime: <?= $arParams['HIDE_TIMEBAR'] == 'Y' ? 'true' : 'false' ?>, callback_after: dateSelected});"
          onmouseover="BX.addClass(this, 'calendar-icon-hover');"
          onmouseout="BX.removeClass(this, 'calendar-icon-hover');">
-        <div class="tabs_type2 tabs_type_l">
+        <div class="tabs_type2 tabs_type_l js-time">
             Время <img alt="" src="<?= $templateFolder ?>/images/icins_04.png">
         </div>
-        <div class="tabs_type2 tabs_type_f">
+        <div class="tabs_type2 tabs_type_f js-date">
             Дата <img alt="" src="<?= $templateFolder ?>/images/icins_02.png">
         </div>
         <div class="clearb"></div>
