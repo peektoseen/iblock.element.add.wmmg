@@ -214,6 +214,20 @@ $arComponentParameters["PARAMETERS"]["DEFAULT_INPUT_SIZE"] = array(
     "DEFAULT" => 500,
 );
 
+$arComponentParameters["PARAMETERS"]["PREVIEW_TEXT_INPUT_SIZE"] = array(
+    "PARENT" => "PARAMS",
+    "NAME" => GetMessage("IBLOCK_PREVIEW_TEXT_INPUT_SIZE"),
+    "TYPE" => "TEXT",
+    "DEFAULT" => 500,
+);
+
+$arComponentParameters["PARAMETERS"]["NAME_INPUT_SIZE"] = array(
+    "PARENT" => "PARAMS",
+    "NAME" => GetMessage("IBLOCK_NAME_INPUT_SIZE"),
+    "TYPE" => "TEXT",
+    "DEFAULT" => 500,
+);
+
 $arComponentParameters["PARAMETERS"]["RESIZE_IMAGES"] = array(
     "PARENT" => "PARAMS",
     "NAME" => GetMessage("CP_BIEAF_RESIZE_IMAGES"),

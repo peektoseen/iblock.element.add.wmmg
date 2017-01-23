@@ -11,7 +11,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
 
 $this->setFrameMode(false);
-CJSCore::Init(array('jquery'));
+CJSCore::Init(array('jquery2'));
 
 if (!CModule::IncludeModule("iblock")) {
     ShowError(GetMessage("CC_BIEAF_IBLOCK_MODULE_NOT_INSTALLED"));
@@ -32,12 +32,42 @@ if ($arParams["IBLOCK_ID"] > 0) {
     $arIBlock = false;
 }
 
+
+// обработка ajax запросов
+if ($_POST['ajax'] == 'Y' && $_POST['component'] == $componentName) {
+    $APPLICATION->RestartBuffer();
+    if ($_POST['action'] == 'get_subsections' && (int)$_POST['id']) {
+
+
+        $rsIBlockSectionList = CIBlockSection::GetList(
+            array("left_margin" => "asc"),
+            array(
+                "ACTIVE" => "Y",
+                "IBLOCK_ID" => $arParams["IBLOCK_ID"],
+                "SECTION_ID" => $_POST['id']
+            ),
+            false,
+            array("ID", "NAME", "DEPTH_LEVEL")
+        );
+
+        $arResult["SECTION_LIST"] = array(0 => array('VALUE'=>'Не установлено'));
+        while ($arSection = $rsIBlockSectionList->GetNext()) {
+            $arResult["SECTION_LIST"][$arSection["ID"]] = array(
+                "VALUE" => $arSection["NAME"]
+            );
+        }
+
+        echo json_encode($arResult["SECTION_LIST"]);
+    }
+    exit;
+}
+
 $arParams["ID"] = intval($_REQUEST["CODE"]);
 $arParams["MAX_FILE_SIZE"] = intval($arParams["MAX_FILE_SIZE"]);
 $arParams["PREVIEW_TEXT_USE_HTML_EDITOR"] = $arParams["PREVIEW_TEXT_USE_HTML_EDITOR"] === "Y" && CModule::IncludeModule("fileman");
 $arParams["DETAIL_TEXT_USE_HTML_EDITOR"] = $arParams["DETAIL_TEXT_USE_HTML_EDITOR"] === "Y" && CModule::IncludeModule("fileman");
 $arParams["RESIZE_IMAGES"] = $arParams["RESIZE_IMAGES"] === "Y";
-$arParams["AGREEMENT"] = $arParams["AGREEMENT"] == "Y" && strlen($arParams["AGREEMENT_URL"])? true : false;
+$arParams["AGREEMENT"] = $arParams["AGREEMENT"] == "Y" && strlen($arParams["AGREEMENT_URL"]) ? true : false;
 
 
 // заполняем массив свойств, которые требуется отобразить
@@ -81,6 +111,7 @@ if ($bAllowAccess) {
         array(
             "ACTIVE" => "Y",
             "IBLOCK_ID" => $arParams["IBLOCK_ID"],
+            "DEPTH_LEVEL" => 1
         ),
         false,
         array("ID", "NAME", "DEPTH_LEVEL")
@@ -88,7 +119,6 @@ if ($bAllowAccess) {
 
     $arResult["SECTION_LIST"] = array();
     while ($arSection = $rsIBlockSectionList->GetNext()) {
-        $arSection["NAME"] = str_repeat(" . ", $arSection["DEPTH_LEVEL"]) . $arSection["NAME"];
         $arResult["SECTION_LIST"][$arSection["ID"]] = array(
             "VALUE" => $arSection["NAME"]
         );
@@ -106,7 +136,7 @@ if ($bAllowAccess) {
         "NAME" => array(
             "PROPERTY_TYPE" => "S",
             "MULTIPLE" => "N",
-            "COL_COUNT" => $COL_COUNT,
+            "COL_COUNT" => ((int)$arParams["NAME_INPUT_SIZE"] ? (int)$arParams["NAME_INPUT_SIZE"] :$COL_COUNT),
         ),
 
         "DATE_ACTIVE_FROM" => array(
@@ -132,7 +162,7 @@ if ($bAllowAccess) {
             "PROPERTY_TYPE" => ($arParams["PREVIEW_TEXT_USE_HTML_EDITOR"] ? "HTML" : "T"),
             "MULTIPLE" => "N",
             "ROW_COUNT" => "5",
-            "COL_COUNT" => $COL_COUNT,
+            "COL_COUNT" => ((int)$arParams["PREVIEW_TEXT_INPUT_SIZE"] ? (int)$arParams["PREVIEW_TEXT_INPUT_SIZE"] :$COL_COUNT),
         ),
         "PREVIEW_PICTURE" => array(
             "PROPERTY_TYPE" => "F",
@@ -152,10 +182,6 @@ if ($bAllowAccess) {
         ),
 
     );
-
-
-//    if($arParams['IBLOCK_USER_LINK_INADD_PROPERTY'] == )
-//    $arParams["PROPERTY_CODES"][] = $arP
 
     // Добавляем коды свойств из PROPERTY_LIST_FULL в PROPERTY_LIST
     foreach ($arResult["PROPERTY_LIST_FULL"] as $key => $arr) {
@@ -287,12 +313,16 @@ if ($bAllowAccess) {
                 else {
                     $arUpdatePropertyValues[$propertyID] = array();
                     foreach ($arPropertyValue as $key => $value) {
+                        // изображение может прийти в base64
+
                         $arFile = $_FILES["PROPERTY_FILE_" . $propertyID . "_" . $key];
                         $arFile["del"] = $_REQUEST["DELETE_FILE"][$propertyID][$key] == "Y" ? "Y" : "";
                         $arUpdatePropertyValues[$propertyID][$key] = $arFile;
 
                         if (($arParams["MAX_FILE_SIZE"] > 0) && ($arFile["size"] > $arParams["MAX_FILE_SIZE"]))
                             $arResult["ERRORS"][] = GetMessage("IBLOCK_ERROR_FILE_TOO_LARGE");
+
+
                     }
 
                     if (empty($arUpdatePropertyValues[$propertyID]))
@@ -458,7 +488,7 @@ if ($bAllowAccess) {
         // проверяем соглашение
         if ($arParams["AGREEMENT"]) {
             if ($_POST["AGREEMENT"] !== "Y") {
-                $arResult["ERRORS"][]  = GetMessage("IBLOCK_ADD_NEED_AGREEMENT");
+                $arResult["ERRORS"][] = GetMessage("IBLOCK_ADD_NEED_AGREEMENT");
             }
         }
 

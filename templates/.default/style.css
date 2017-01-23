@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Museo Sans Cyrl';
-    src: local('./fonts/Museo Sans Cyrl 500'), local('./fonts/MuseoSansCyrl-500'), url('./fonts/Museosanscyrl500.woff2') format('woff2'), url('./fonts/Museosanscyrl500.woff') format('woff'), url('./fonts/Museosanscyrl500.ttf') format('truetype');
+    src: local('./fonts/Museo Sans Cyrl 500'), local('./fonts/MuseoSansCyrl-500'), url('fonts/Museosanscyrl500.woff2') format('woff2'), url('fonts/Museosanscyrl500.woff') format('woff'), url('fonts/Museosanscyrl500.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
 }
@@ -268,8 +268,8 @@ progress::-moz-progress-bar {
 
 select {
     border-radius: 5px;
-    /*height: 28px;*/
-    height: 100px;
+    height: 28px;
+    /*height: 100px;*/
     border: 1px solid grey;
     /*width: 80%;*/
     width: 100%;
@@ -316,4 +316,22 @@ label {
     cursor: pointer;
     font-size: 17px;
     font-weight: bold;
+}
+
+.epic_big_btn:disabled {
+    opacity: 0.3;
+}
+
+.canvas-container, .canvas-container canvas {
+    max-width: 100%;
+    /*height: auto!important;*/
+}
+
+#myModal .modal-body {
+    max-width: 100%;
+}
+
+#myModal .modal-body img {
+    max-width: 100%;
+    height: auto;
 }

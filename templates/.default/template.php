@@ -1,28 +1,33 @@
 <?
 if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
-/** @var array $arParams */
-/** @var array $arResult */
-/** @global CMain $APPLICATION */
-/** @global CUser $USER */
-/** @global CDatabase $DB */
-/** @var CBitrixComponentTemplate $this */
-/** @var string $templateName */
-/** @var string $templateFile */
-/** @var string $templateFolder */
-/** @var string $componentPath */
-/** @var CBitrixComponent $component */
+
+use Bitrix\Main\Page\Asset;
+
+
+require_once($_SERVER['DOCUMENT_ROOT'] . $templateFolder . '/CIBlockPropertyDateTime_.php');
+CIBlockPropertyDateTime_::$component = $component;
+
 $this->setFrameMode(false);
 
-//echo '<pre>' . print_r($arResult, true) . '</pre>';
-//echo '<pre>' . print_r($arParams, true) . '</pre>';
+$asset = Asset::getInstance();
 
+$asset->addJs($templateFolder . '/assets/js/bootstrap.min.js');
+//$asset->addJs($templateFolder . '/assets/js/darkroom.js', true);
+
+$asset->addCss($templateFolder . '/assets/css/bootstrap.min.css');
+$asset->addCss($templateFolder . '/assets/css/darkroom.css');
+?>
+<script type="text/javascript" src="<?=$templateFolder . '/assets/js/fabric.js'?>"></script>
+<script type="text/javascript" src="<?=$templateFolder . '/assets/js/darkroom.js'?>"></script>
+<?
 
 if ((int)$arParams["ID"] > 0):?>
     <? ShowNote($arParams["USER_MESSAGE_ADD"]);
     return; ?>
 <? endif ?>
 
-<div class="body_obr">
+
+<div class="body_obr" id="<?= $this->GetEditAreaID('form') ?>">
     <? if (!empty($arResult["ERRORS"])): ?>
         <? ShowError(implode("<br />", $arResult["ERRORS"])) ?>
     <?endif;
@@ -32,6 +37,7 @@ if ((int)$arParams["ID"] > 0):?>
 
     <form name="iblock_add" action="<?= POST_FORM_ACTION_URI ?>" method="post" enctype="multipart/form-data">
         <?= bitrix_sessid_post() ?>
+
         <? if ($arParams["MAX_FILE_SIZE"] > 0): ?>
             <input type="hidden" name="MAX_FILE_SIZE" value="<?= $arParams["MAX_FILE_SIZE"] ?>"/>
         <? endif ?>
@@ -53,6 +59,12 @@ if ((int)$arParams["ID"] > 0):?>
 
                             <? if (in_array($propertyID, $arResult["PROPERTY_REQUIRED"])): ?>
                                 <span class="starrequired">*</span>
+                            <? endif ?>
+                            <? if (strlen($arResult["PROPERTY_LIST_FULL"][$propertyID]["HINT"])): ?>
+                                <img alt="<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]["HINT"] ?>"
+                                     title="<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]["HINT"] ?>"
+                                     class="cp"
+                                     src="<?= $templateFolder ?>/img/icins_06.png">
                             <? endif ?>
                             <? //todo: показывать иконку вопроса?>
                             <!--                            <img class="cp" src="-->
@@ -100,12 +112,12 @@ if ((int)$arParams["ID"] > 0):?>
                 switch ($INPUT_TYPE):
                     case "USER_LINKED":
                         ?>
-                        <div class="line_row <? if (!empty($arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'])): ?>property_<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'] ?><? else: ?>property_<?= $propertyID ?><? endif ?>">
+                        <div class="line_row js-radiobutton <? if (!empty($arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'])): ?>property_<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'] ?><? else: ?>property_<?= $propertyID ?><? endif ?>">
                             <div class="line_dashed">
                                 <? $first = true; ?>
                                 <? foreach ($arResult["PROPERTY_LIST_FULL"][$propertyID]["ENUM"] as $id => $name): ?>
                                     <label class="custom-radio" for="property_<?= $propertyID ?>">
-                                        <input id="property_<?= $propertyID ?>" name="PROPERTY[<?= $propertyID ?>][]"
+                                        <input name="PROPERTY[<?= $propertyID ?>][]"
                                                value="<?= $id ?>" type="radio" <? if ($first): ?>checked<? endif ?>>
                                         <div></div>
                                         <?= $name ?>
@@ -118,6 +130,8 @@ if ((int)$arParams["ID"] > 0):?>
                         <?
                         break;
                     case "USER_TYPE":
+
+
                         for ($i = 0; $i < $inputNum; $i++) {
                             if ($arParams["ID"] > 0 || count($arResult["ERRORS"]) > 0) {
                                 $value = intval($propertyID) > 0 ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["~VALUE"] : $arResult["ELEMENT"][$propertyID];
@@ -129,6 +143,18 @@ if ((int)$arParams["ID"] > 0):?>
                                 $value = "";
                                 $description = "";
                             }
+
+                            // кастомная обработка свойтсва типа "Дата/Время"
+                            if ($arResult["PROPERTY_LIST_FULL"][$propertyID]["GetPublicEditHTML"] == array(
+                                    0 => 'CIBlockPropertyDateTime',
+                                    1 => 'GetPublicEditHTML',
+                                )
+                            ) {
+                                $arResult["PROPERTY_LIST_FULL"][$propertyID]["GetPublicEditHTML"] = array(
+                                    'CIBlockPropertyDateTime_', 'GetPublicEditHTML');
+                            }
+
+
                             echo call_user_func_array($arResult["PROPERTY_LIST_FULL"][$propertyID]["GetPublicEditHTML"],
                                 array(
                                     $arResult["PROPERTY_LIST_FULL"][$propertyID],
@@ -240,8 +266,9 @@ if ((int)$arParams["ID"] > 0):?>
                             } else {
                                 $value = "";
                             }
-                            ?>
 
+
+                            ?>
 
                             <div class="line_row <? if (!empty($arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'])): ?>property_<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'] ?><? else: ?>property_<?= $propertyID ?><? endif ?>">
                                 <? //todo: вынести в lang файл?>
@@ -262,7 +289,10 @@ if ((int)$arParams["ID"] > 0):?>
                                 </div>
                             </div>
 
-                            <? if ($arResult["PROPERTY_LIST_FULL"][$propertyID]["USER_TYPE"] == "DateTime"): ?><?
+                            <?
+
+
+                            if ($arResult["PROPERTY_LIST_FULL"][$propertyID]["USER_TYPE"] == "DateTime"): ?><?
                                 $APPLICATION->IncludeComponent(
                                     'bitrix:main.calendar',
                                     '',
@@ -356,32 +386,71 @@ if ((int)$arParams["ID"] > 0):?>
 
                             case "dropdown":
                             case "multiselect":
-                                ?>
-                                <select name="PROPERTY[<?= $propertyID ?>]<?= $type == "multiselect" ? "[]\" size=\"" . $arResult["PROPERTY_LIST_FULL"][$propertyID]["ROW_COUNT"] . "\" multiple=\"multiple" : "" ?>">
-                                    <option value=""><? echo GetMessage("CT_BIEAF_PROPERTY_VALUE_NA") ?></option>
-                                    <?
-                                    if (intval($propertyID) > 0) $sKey = "ELEMENT_PROPERTIES";
-                                    else $sKey = "ELEMENT";
 
-                                    foreach ($arResult["PROPERTY_LIST_FULL"][$propertyID]["ENUM"] as $key => $arEnum) {
-                                        $checked = false;
-                                        if ($arParams["ID"] > 0 || count($arResult["ERRORS"]) > 0) {
-                                            foreach ($arResult[$sKey][$propertyID] as $elKey => $arElEnum) {
-                                                if ($key == $arElEnum["VALUE"]) {
-                                                    $checked = true;
-                                                    break;
+                                if ($propertyID == 'IBLOCK_SECTION'):?>
+                                    <div class="line_row">
+
+                                        <div class="line_row_w50">
+                                            <div class="line_row_header">
+                                                <h2 class="h2_s">
+                                                    Категория <img alt="" class="cp"
+                                                                   src="<?= $templateFolder . '/img/icins_06.png' ?>">
+                                                </h2><select name="PROPERTY[<?= $propertyID ?>][]" class="js-section">
+                                                    <option value="0" selected>
+                                                        Не установлено
+                                                    </option>
+                                                    <? foreach ($arResult['SECTION_LIST'] as $section_id => $arSection): ?>
+                                                        <option value="<?= $section_id ?>">
+                                                            <?= $arSection['VALUE'] ?>
+                                                        </option>
+                                                    <? endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="line_row_w50 custom_01">
+                                            <div class="line_row_header">
+                                                <h2 class="h2_s">
+                                                    Подкатегория <img alt="" class="cp"
+                                                                      src="<?= $templateFolder . '/img/icins_06.png' ?>">
+                                                </h2><select name="PROPERTY[<?= $propertyID ?>][]"
+                                                             class="js-subsection">
+                                                    <option value="0">
+                                                        Не установлено
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <?
+                                else: ?>
+                                    <select name="PROPERTY[<?= $propertyID ?>]<?= $type == "multiselect" ? "[]\" size=\"" . $arResult["PROPERTY_LIST_FULL"][$propertyID]["ROW_COUNT"] . "\" multiple=\"multiple" : "" ?>">
+                                        <option value=""><? echo GetMessage("CT_BIEAF_PROPERTY_VALUE_NA") ?></option>
+                                        <?
+                                        if (intval($propertyID) > 0) $sKey = "ELEMENT_PROPERTIES";
+                                        else $sKey = "ELEMENT";
+
+                                        foreach ($arResult["PROPERTY_LIST_FULL"][$propertyID]["ENUM"] as $key => $arEnum) {
+                                            $checked = false;
+                                            if ($arParams["ID"] > 0 || count($arResult["ERRORS"]) > 0) {
+                                                foreach ($arResult[$sKey][$propertyID] as $elKey => $arElEnum) {
+                                                    if ($key == $arElEnum["VALUE"]) {
+                                                        $checked = true;
+                                                        break;
+                                                    }
                                                 }
+                                            } else {
+                                                if ($arEnum["DEF"] == "Y") $checked = true;
                                             }
-                                        } else {
-                                            if ($arEnum["DEF"] == "Y") $checked = true;
+                                            ?>
+                                            <option value="<?= $key ?>" <?= $checked ? " selected=\"selected\"" : "" ?>><?= $arEnum["VALUE"] ?></option>
+                                            <?
                                         }
                                         ?>
-                                        <option value="<?= $key ?>" <?= $checked ? " selected=\"selected\"" : "" ?>><?= $arEnum["VALUE"] ?></option>
-                                        <?
-                                    }
-                                    ?>
-                                </select>
-                                <?
+                                    </select>
+                                <?endif;
                                 break;
 
                         endswitch;
@@ -449,6 +518,7 @@ if ((int)$arParams["ID"] > 0):?>
 
         <div class="line_row">
             <input class="epic_big_btn" name="iblock_submit" type="submit"
+                   <? if ($arParams['AGREEMENT']): ?>disabled="disabled"<? endif ?>
                    value="<?= GetMessage("IBLOCK_FORM_SUBMIT") ?>">
         </div>
 
@@ -458,9 +528,45 @@ if ((int)$arParams["ID"] > 0):?>
                 <label class="custom-check">
                     <input id="id_orders" name="AGREEMENT" type="checkbox" value="Y">
                     <div></div>
-                    Я согласен с <a href="<?= $arParams["AGREEMENT_URL"] ?>" target="_blank">Правилами сайта</a></label>
+                    Я согласен с <a href="<?= $arParams["AGREEMENT_URL"] ?>" target="_blank">Правилами
+                        сайта</a></label>
             </div>
         <? endif ?>
     </form>
 
 </div>
+
+
+<? // добавление изображения ?>
+<!-- Trigger the modal with a button -->
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Редактор изображений</h4>
+            </div>
+            <div class="modal-body">
+                <img src="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Принять</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+        $('#<?=$this->GetEditAreaID('form')?>').FormAdd(
+            {component: "<?=$component->getName()?>"}
+        );
+    })
+</script>
+

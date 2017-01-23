@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
-    $("input[type=text], textarea").bind("change keyup", function(e) {
+    $("input[type=text], textarea").bind("change keyup", function (e) {
         var e$ = $(e.target);
         var wrap$ = e$.parents('.line_row');
         var progress$ = $('progress', wrap$);
@@ -15,32 +15,32 @@ $(document).ready(function() {
             counter$.html(e$.val().length);
         }
     });
-/*
 
-    $("#text_obr").bind("change keyup", function() {
-        $("#counter2_pr").val($(this).val().length / 500 * 100);
-        if ($(this).val().length >= 500) {
-            $(this).val($(this).val().substr(0, 500));
-            $("#counter2").html("<span class='c_red'>" + $(this).val().length + "</span>");
-        } else {
-            $("#counter2").html($(this).val().length);
-        }
-    });
-*/
-
-    $(".line_row_w66 .tabs_type").click(function() {
+    $(".line_row_w66 .tabs_type").click(function () {
         $(".line_row_w66 .tabs_type").removeClass("active");
         $(this).addClass("active");
     });
-
 
     $('input[type=file]').on('change', function (e) {
         var wrapper$ = $(e.target).parent('.js-file-input'),
             output$ = $('img.uploaded', wrapper$);
 
         // если это изображение - то отображаем превью
-        if(!!e.target.files[0].name.split('.').pop().toLowerCase().match(/^(jpg|gif|bmp|png|jpeg)$/)) {
+        if (!!e.target.files[0].name.split('.').pop().toLowerCase().match(/^(jpg|gif|bmp|png|jpeg)$/)) {
             output$.attr('src', URL.createObjectURL(event.target.files[0]));
+
+            $('#myModal .modal-body').html('<img>');
+            $('#myModal .modal-body img').attr('src', URL.createObjectURL(event.target.files[0]));
+
+            var Dark = new Darkroom('#myModal .modal-body img', {maxHeight: 500 });
+
+            $('#myModal').modal();
+            $('#myModal').on('hidden.bs.modal', function (e) {
+                $('input[type=file]').eq(0).val($('#myModal img').attr('src'));
+                debugger;
+                // do something...
+            })
+
         }
 
         $('.media_del', wrapper$).show();
@@ -56,14 +56,61 @@ $(document).ready(function() {
         $('.js-del', wrapper$).hide();
     });
 
-    $('.js-file-input').on('click', function(e){
+    $('.js-file-input').on('click', function (e) {
         var t$ = $(e.target);
-        if(t$.attr('type') == 'file') return;
-        if(t$.parents('.js-del').length) return;
+        if (t$.attr('type') == 'file') return;
+        if (t$.parents('.js-del').length) return;
         e.preventDefault();
         e.stopPropagation();
-        if(!t$.hasClass('js-file-input')) t$ = t$.parent('.js-file-input');
+        if (!t$.hasClass('js-file-input')) t$ = t$.parent('.js-file-input');
         $('input[type=file]', t$).trigger('click');
-    })
+    });
+
+    $.fn.FormAdd = function (options) {
+        var $wrapper = this,
+            $agreement_wrapper = $('#id_orders');
+
+        if ($agreement_wrapper.length) {
+            $('input[type=checkbox]').on('change', function (e) {
+                if ($(e.target).is(':checked')) {
+                    $('.epic_big_btn').removeAttr('disabled');
+                } else {
+                    $('.epic_big_btn').attr('disabled', 'disabled');
+                }
+            })
+        }
+
+        $('.js-section', $wrapper).on('change', function (e) {
+            var $t = $(e.target);
+            if (!$t.val()) return;
+            $.ajax('', {
+                data: {id: $t.val(), component: options.component, ajax: 'Y', action: 'get_subsections'},
+                method: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    $('.js-subsection', $wrapper).html('');
+                    for (var key in data) {
+                        var el = $('<option value=\'' + key + '\'>' + data[key]['VALUE'] + '</option>');
+                        $('.js-subsection', $wrapper).append(el);
+                    }
+                }
+            })
+        });
+
+        $('.js-radiobutton label', $wrapper).on('click', function (e) {
+            var $target = $(e.target),
+                $wrapper = $target.parents('.js-radiobutton');
+
+            if ($target.is('input')) return true;
+
+            $target = $target.parents('label').length ? $target.parents('label') : $target;
+
+            $('input[type=radio]', $wrapper).attr('checked', false);
+            $('input[type=radio]', $target).trigger('click');
+        });
+
+
+    };
+
 
 });
