@@ -335,10 +335,10 @@ if ((int)$arParams["ID"] > 0):?>
                                     </div>
 
 
-                                    <input type="hidden"
+                                    <input type="hidden" id="<?=$this->GetEditAreaID('file_input'.$i.'_hidden')?>"
                                            name="PROPERTY[<?= $propertyID ?>][<?= $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] : $i ?>]"
                                            value="<?= $value ?>"/>
-                                    <input type="file" style="display: none;"
+                                    <input type="file" style="display: none;" id="<?=$this->GetEditAreaID('file_input'.$i)?>"
                                            size="<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]["COL_COUNT"] ?>"
                                            name="PROPERTY_FILE_<?= $propertyID ?>_<?= $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] : $i ?>"/>
 

@@ -81,6 +81,10 @@ $arComponentParameters = array(
             "NAME" => GetMessage("IBLOCK_TITLES"),
             "SORT" => "1000",
         ),
+        "SORT" => array(
+            "NAME" => "Сортировка полей",
+            "SORT" => "1000",
+        ),
         "USER_LINK" => array(
             //todo: вынести в lang
             "NAME" => "Привязка к пользователю",
@@ -248,6 +252,13 @@ foreach ($arVirtualProperties as $key => $title) {
         "NAME" => $title,
         "TYPE" => "STRING",
     );
+
+    $arComponentParameters["PARAMETERS"]["CUSTOM_SORT_" . $key] = array(
+        "PARENT" => "SORT",
+        "NAME" => 'Индекс сортировки для ' . $title,
+        "TYPE" => "STRING",
+    );
+
 }
 
 ?>

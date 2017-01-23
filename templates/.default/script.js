@@ -23,7 +23,10 @@ $(document).ready(function () {
 
     $('input[type=file]').on('change', function (e) {
         var wrapper$ = $(e.target).parent('.js-file-input'),
-            output$ = $('img.uploaded', wrapper$);
+            output$ = $('img.uploaded', wrapper$),
+            fileinput$ = $(e.target);
+
+        $('#' + fileinput$.attr('id') + '_hidden').val('');
 
         // если это изображение - то отображаем превью
         if (!!e.target.files[0].name.split('.').pop().toLowerCase().match(/^(jpg|gif|bmp|png|jpeg)$/)) {
@@ -32,19 +35,21 @@ $(document).ready(function () {
             $('#myModal .modal-body').html('<img>');
             $('#myModal .modal-body img').attr('src', URL.createObjectURL(event.target.files[0]));
 
-            var Dark = new Darkroom('#myModal .modal-body img', {maxHeight: 500 });
-
+            var Dark = new Darkroom('#myModal .modal-body img', {maxHeight: 500});
+            $('#myModal').data('initiator', fileinput$.attr('id'));
             $('#myModal').modal();
-            $('#myModal').on('hidden.bs.modal', function (e) {
-                $('input[type=file]').eq(0).val($('#myModal img').attr('src'));
-                debugger;
-                // do something...
-            })
-
         }
 
         $('.media_del', wrapper$).show();
 
+    });
+
+
+    $('#myModal').on('hidden.bs.modal', function (e) {
+        var img_input_id = $('#myModal').data('initiator');
+        if (!!$('#myModal img').length && !!$('#myModal img').attr('src').match(/base64/)) {
+            $('#' + img_input_id + '_hidden').val($('#myModal img').attr('src'));
+        }
     });
 
     $('.js-file-input .js-del').on('click', function (e) {
@@ -52,6 +57,7 @@ $(document).ready(function () {
             input$ = $('input[type=file]', wrapper$),
             img$ = $('img.uploaded', wrapper$);
         input$.val('');
+        $('#' + input$.attr('id') + '_hidden').val('');
         img$.attr('src', img$.data('src'));
         $('.js-del', wrapper$).hide();
     });

@@ -24,6 +24,7 @@ if (0 >= (int)$arParams['IBLOCK_USER_LINK_ID']) {
     return;
 }
 
+
 $arElement = false;
 
 if ($arParams["IBLOCK_ID"] > 0) {
@@ -50,7 +51,7 @@ if ($_POST['ajax'] == 'Y' && $_POST['component'] == $componentName) {
             array("ID", "NAME", "DEPTH_LEVEL")
         );
 
-        $arResult["SECTION_LIST"] = array(0 => array('VALUE'=>'Не установлено'));
+        $arResult["SECTION_LIST"] = array(0 => array('VALUE' => 'Не установлено'));
         while ($arSection = $rsIBlockSectionList->GetNext()) {
             $arResult["SECTION_LIST"][$arSection["ID"]] = array(
                 "VALUE" => $arSection["NAME"]
@@ -136,19 +137,22 @@ if ($bAllowAccess) {
         "NAME" => array(
             "PROPERTY_TYPE" => "S",
             "MULTIPLE" => "N",
-            "COL_COUNT" => ((int)$arParams["NAME_INPUT_SIZE"] ? (int)$arParams["NAME_INPUT_SIZE"] :$COL_COUNT),
+            "COL_COUNT" => ((int)$arParams["NAME_INPUT_SIZE"] ? (int)$arParams["NAME_INPUT_SIZE"] : $COL_COUNT),
+            "SORT" => ((int)$arParams["CUSTOM_SORT_NAME"] ? (int)$arParams["CUSTOM_SORT_NAME"] : 0)
         ),
 
         "DATE_ACTIVE_FROM" => array(
             "PROPERTY_TYPE" => "S",
             "MULTIPLE" => "N",
             "USER_TYPE" => "DateTime",
+            "SORT" => ((int)$arParams["CUSTOM_SORT_DATE_ACTIVE_FROM"] ? (int)$arParams["CUSTOM_SORT_DATE_ACTIVE_FROM"] : 0)
         ),
 
         "DATE_ACTIVE_TO" => array(
             "PROPERTY_TYPE" => "S",
             "MULTIPLE" => "N",
             "USER_TYPE" => "DateTime",
+            "SORT" => ((int)$arParams["CUSTOM_SORT_DATE_ACTIVE_TO"] ? (int)$arParams["CUSTOM_SORT_DATE_ACTIVE_TO"] : 0)
         ),
 
         "IBLOCK_SECTION" => array(
@@ -156,29 +160,35 @@ if ($bAllowAccess) {
             "ROW_COUNT" => "8",
             "MULTIPLE" => $arParams["MAX_LEVELS"] == 1 ? "N" : "Y",
             "ENUM" => $arResult["SECTION_LIST"],
+            "SORT" => ((int)$arParams["CUSTOM_SORT_IBLOCK_SECTION"] ? (int)$arParams["CUSTOM_SORT_IBLOCK_SECTION"] : 0)
+
         ),
 
         "PREVIEW_TEXT" => array(
             "PROPERTY_TYPE" => ($arParams["PREVIEW_TEXT_USE_HTML_EDITOR"] ? "HTML" : "T"),
             "MULTIPLE" => "N",
             "ROW_COUNT" => "5",
-            "COL_COUNT" => ((int)$arParams["PREVIEW_TEXT_INPUT_SIZE"] ? (int)$arParams["PREVIEW_TEXT_INPUT_SIZE"] :$COL_COUNT),
+            "COL_COUNT" => ((int)$arParams["PREVIEW_TEXT_INPUT_SIZE"] ? (int)$arParams["PREVIEW_TEXT_INPUT_SIZE"] : $COL_COUNT),
+            "SORT" => ((int)$arParams["CUSTOM_SORT_PREVIEW_TEXT"] ? (int)$arParams["CUSTOM_SORT_PREVIEW_TEXT"] : 0)
         ),
         "PREVIEW_PICTURE" => array(
             "PROPERTY_TYPE" => "F",
             "FILE_TYPE" => "jpg, gif, bmp, png, jpeg",
             "MULTIPLE" => "N",
+            "SORT" => ((int)$arParams["CUSTOM_SORT_PREVIEW_PICTURE"] ? (int)$arParams["CUSTOM_SORT_PREVIEW_PICTURE"] : 0)
         ),
         "DETAIL_TEXT" => array(
             "PROPERTY_TYPE" => ($arParams["DETAIL_TEXT_USE_HTML_EDITOR"] ? "HTML" : "T"),
             "MULTIPLE" => "N",
             "ROW_COUNT" => "5",
             "COL_COUNT" => $COL_COUNT,
+            "SORT" => ((int)$arParams["CUSTOM_SORT_DETAIL_TEXT"] ? (int)$arParams["CUSTOM_SORT_DETAIL_TEXT"] : 0)
         ),
         "DETAIL_PICTURE" => array(
             "PROPERTY_TYPE" => "F",
             "FILE_TYPE" => "jpg, gif, bmp, png, jpeg",
             "MULTIPLE" => "N",
+            "SORT" => ((int)$arParams["CUSTOM_SORT_DETAIL_PICTURE"] ? (int)$arParams["CUSTOM_SORT_DETAIL_PICTURE"] : 0)
         ),
 
     );
@@ -187,6 +197,7 @@ if ($bAllowAccess) {
     foreach ($arResult["PROPERTY_LIST_FULL"] as $key => $arr) {
         if (in_array($key, $arParams["PROPERTY_CODES"])) $arResult["PROPERTY_LIST"][] = $key;
     }
+
 
     // получаем список свойств инфоблока
     $rsIBLockPropertyList = CIBlockProperty::GetList(array("sort" => "asc", "name" => "asc"), array("ACTIVE" => "Y", "IBLOCK_ID" => $arParams["IBLOCK_ID"]));
@@ -264,6 +275,19 @@ if ($bAllowAccess) {
     // в $arResult["PROPERTY_LIST_FULL"] - все свойства текущего инфоблока
 
 
+    // сортируем в соответствии с индексами сортировки
+    $arTmpPropList = array();
+    foreach ($arResult["PROPERTY_LIST"] as $i => $item) {
+        $arTmpPropList[$item] = $arResult["PROPERTY_LIST_FULL"][$item];
+    }
+    uasort($arTmpPropList, function ($item1, $item2) {
+        if ((int)$item1["SORT"] == (int)$item2["SORT"]) {
+            return 0;
+        }
+        return (int)$item1["SORT"] > (int)$item2["SORT"] ? 1 : -1;
+    });
+    $arResult['PROPERTY_LIST'] = array_keys($arTmpPropList);
+
     // обработка POST запроса
     if (check_bitrix_sessid() && (!empty($_REQUEST["iblock_submit"]) || !empty($_REQUEST["iblock_apply"]))) {
 
@@ -273,7 +297,6 @@ if ($bAllowAccess) {
         $arUpdatePropertyValues = array();
 
         // обрабатываем список свойств
-
 
         foreach ($arParams["PROPERTY_CODES"] as $i => $propertyID) {
 
@@ -313,15 +336,27 @@ if ($bAllowAccess) {
                 else {
                     $arUpdatePropertyValues[$propertyID] = array();
                     foreach ($arPropertyValue as $key => $value) {
-                        // изображение может прийти в base64
 
-                        $arFile = $_FILES["PROPERTY_FILE_" . $propertyID . "_" . $key];
-                        $arFile["del"] = $_REQUEST["DELETE_FILE"][$propertyID][$key] == "Y" ? "Y" : "";
-                        $arUpdatePropertyValues[$propertyID][$key] = $arFile;
+                        if (strlen($value)) {
+                            $data = $value;
+                            list($type, $data) = explode(';', $data);
+                            list(, $data) = explode(',', $data);
+                            $data = base64_decode($data);
+                            $h = tmpfile();
+                            fwrite($h, $data);
+                            $file_data = stream_get_meta_data($h);
+                            $arFile = CFile::MakeFileArray($file_data['uri']);
+                            $arFile['name'] = $_FILES["PROPERTY_FILE_" . $propertyID . "_" . $key]['name'];
+                            $fileId = CFile::SaveFile($arFile);
+                            $arUpdatePropertyValues[$propertyID][$key] = $fileId;
+                        } else {
+                            $arFile = $_FILES["PROPERTY_FILE_" . $propertyID . "_" . $key];
+                            $arFile["del"] = $_REQUEST["DELETE_FILE"][$propertyID][$key] == "Y" ? "Y" : "";
+                            $arUpdatePropertyValues[$propertyID][$key] = $arFile;
 
-                        if (($arParams["MAX_FILE_SIZE"] > 0) && ($arFile["size"] > $arParams["MAX_FILE_SIZE"]))
-                            $arResult["ERRORS"][] = GetMessage("IBLOCK_ERROR_FILE_TOO_LARGE");
-
+                            if (($arParams["MAX_FILE_SIZE"] > 0) && ($arFile["size"] > $arParams["MAX_FILE_SIZE"]))
+                                $arResult["ERRORS"][] = GetMessage("IBLOCK_ERROR_FILE_TOO_LARGE");
+                        }
 
                     }
 
