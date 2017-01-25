@@ -11,7 +11,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
 
 $this->setFrameMode(false);
-CJSCore::Init(array('jquery2'));
+//CJSCore::Init(array('jquery2'));
 
 if (!CModule::IncludeModule("iblock")) {
     ShowError(GetMessage("CC_BIEAF_IBLOCK_MODULE_NOT_INSTALLED"));
@@ -181,7 +181,7 @@ if ($bAllowAccess) {
             "PROPERTY_TYPE" => ($arParams["DETAIL_TEXT_USE_HTML_EDITOR"] ? "HTML" : "T"),
             "MULTIPLE" => "N",
             "ROW_COUNT" => "5",
-            "COL_COUNT" => $COL_COUNT,
+            "COL_COUNT" => ((int)$arParams["PREVIEW_TEXT_INPUT_SIZE"] ? (int)$arParams["PREVIEW_TEXT_INPUT_SIZE"] : $COL_COUNT),
             "SORT" => ((int)$arParams["CUSTOM_SORT_DETAIL_TEXT"] ? (int)$arParams["CUSTOM_SORT_DETAIL_TEXT"] : 0)
         ),
         "DETAIL_PICTURE" => array(

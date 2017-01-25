@@ -11,7 +11,7 @@ $this->setFrameMode(false);
 
 $asset = Asset::getInstance();
 
-$asset->addJs($templateFolder . '/assets/js/bootstrap.min.js');
+$asset->addJs($templateFolder . '/assets/js/bootstrap.min.js', true);
 //$asset->addJs($templateFolder . '/assets/js/darkroom.js', true);
 
 $asset->addCss($templateFolder . '/assets/css/bootstrap.min.css');
@@ -228,7 +228,6 @@ if ((int)$arParams["ID"] > 0):?>
                                 $value = "";
                             }
                             ?>
-
 
                             <div class="line_row <? if (!empty($arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'])): ?>property_<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'] ?><? else: ?>property_<?= $propertyID ?><? endif ?>">
                                 <textarea class="w100"
