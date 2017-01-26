@@ -544,7 +544,7 @@ if ((int)$arParams["ID"] > 0):?>
 <!-- Trigger the modal with a button -->
 
 <!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
+<div id="myModal" class="modal modal-fullscreen fade" tabindex="-1"  aria-labelledby="myModalLabel" aria-hidden="true" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->

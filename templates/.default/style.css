@@ -338,17 +338,42 @@ label {
     overflow: auto;
 }
 
-/*
-
-.canvas-container, .canvas-container canvas {
-    max-width: 100%;
+.modal-fullscreen {
+    background: transparent;
+}
+.modal-fullscreen .modal-content {
+    background: transparent;
+    border: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+.modal-backdrop.modal-backdrop-fullscreen {
+    background: #ffffff;
+}
+.modal-backdrop.modal-backdrop-fullscreen.in {
+    opacity: .97;
+    filter: alpha(opacity=97);
 }
 
-#myModal .modal-body {
-    max-width: 100%;
-}
 
-#myModal .modal-body img {
-    max-width: 100%;
-    height: auto;
-}*/
+.modal-fullscreen .modal-dialog {
+    margin: 0;
+    margin-right: auto;
+    margin-left: auto;
+    width: 100%;
+}
+@media (min-width: 768px) {
+    .modal-fullscreen .modal-dialog {
+        width: 750px;
+    }
+}
+@media (min-width: 992px) {
+    .modal-fullscreen .modal-dialog {
+        width: 970px;
+    }
+}
+@media (min-width: 1200px) {
+    .modal-fullscreen .modal-dialog {
+        width: 1170px;
+    }
+}
