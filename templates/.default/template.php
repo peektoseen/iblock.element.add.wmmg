@@ -333,6 +333,10 @@ if ((int)$arParams["ID"] > 0):?>
                                         <img alt="" src="<?= $templateFolder . '/img/icins_14.png' ?>">
                                     </div>
 
+                                    <div class="media_edit js-edit" style="display: none">
+                                        <img alt="" src="<?= $templateFolder . '/img/1485436389_circle-edit-line.png' ?>">
+                                    </div>
+
 
                                     <input type="hidden" id="<?=$this->GetEditAreaID('file_input'.$i.'_hidden')?>"
                                            name="PROPERTY[<?= $propertyID ?>][<?= $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] : $i ?>]"

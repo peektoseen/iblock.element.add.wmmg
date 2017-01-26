@@ -38,17 +38,35 @@ $(document).ready(function () {
             var Dark = new Darkroom('#myModal .modal-body img', {maxHeight: 500});
             $('#myModal').data('initiator', fileinput$.attr('id'));
             $('#myModal').modal();
+            $('.js-edit', wrapper$).show();
+
         }
 
-        $('.media_del', wrapper$).show();
+        $('.js-del', wrapper$).show();
 
     });
 
 
+    $('.js-file-input .js-edit').on('click', function (e) {
+        var wrapper$ = $(e.target).parents('.js-file-input'),
+            fileinput$ = $('input[type=file]', wrapper$);
+
+
+        $('#myModal .modal-body').html('<img>');
+        $('#myModal .modal-body img').attr('src', URL.createObjectURL(fileinput$[0].files[0]));
+
+        var Dark = new Darkroom('#myModal .modal-body img', {maxHeight: 500});
+        $('#myModal').data('initiator', fileinput$.attr('id'));
+        $('#myModal').modal();
+    });
+
+
     $('#myModal').on('hidden.bs.modal', function (e) {
-        var img_input_id = $('#myModal').data('initiator');
+        var img_input_id = $('#myModal').data('initiator'),
+            wrapper$ = $('#' + img_input_id).parents('.js-file-input');
         if (!!$('#myModal img').length && !!$('#myModal img').attr('src').match(/base64/)) {
             $('#' + img_input_id + '_hidden').val($('#myModal img').attr('src'));
+            $('.uploaded', wrapper$).attr('src', $('#myModal img').attr('src'));
         }
     });
 
@@ -60,7 +78,9 @@ $(document).ready(function () {
         $('#' + input$.attr('id') + '_hidden').val('');
         img$.attr('src', img$.data('src'));
         $('.js-del', wrapper$).hide();
+        $('.js-edit', wrapper$).hide();
     });
+
 
     $('.js-file-input').on('click', function (e) {
         var t$ = $(e.target);

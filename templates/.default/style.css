@@ -179,6 +179,14 @@ a:link {
     display: none;
 }
 
+.media_edit {
+    cursor: pointer;
+    position: absolute;
+    bottom: 30px;
+    right: 5px;
+    display: none;
+}
+
 .text-center {
     text-align: center;
     font-size: 14px;
@@ -302,7 +310,7 @@ label {
     left: 37%;
 }
 
-.uploaded+.media_del {
+.uploaded+.media_del , .uploaded+.media_edit  {
     display: block;
 }
 

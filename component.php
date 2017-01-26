@@ -11,7 +11,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
 /** @global CMain $APPLICATION */
 
 $this->setFrameMode(false);
-//CJSCore::Init(array('jquery2'));
+if ($arParams['USE_JQUERY'] == 'Y') CJSCore::Init(array('jquery2'));
 
 if (!CModule::IncludeModule("iblock")) {
     ShowError(GetMessage("CC_BIEAF_IBLOCK_MODULE_NOT_INSTALLED"));

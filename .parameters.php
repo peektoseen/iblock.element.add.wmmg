@@ -205,6 +205,13 @@ $arComponentParameters["PARAMETERS"]["USE_CAPTCHA"] = array(
 );
 
 
+$arComponentParameters["PARAMETERS"]["USE_JQUERY"] = array(
+    "PARENT" => "PARAMS",
+    "NAME" => GetMessage("IBLOCK_USE_JQUERY"),
+    "TYPE" => "CHECKBOX",
+    "DEFAULT" => "N",
+);
+
 $arComponentParameters["PARAMETERS"]["USER_MESSAGE_ADD"] = array(
     "PARENT" => "PARAMS",
     "NAME" => GetMessage("IBLOCK_USER_MESSAGE_ADD"),
