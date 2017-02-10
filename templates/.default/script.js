@@ -28,6 +28,7 @@ $(document).ready(function () {
 
         $('#' + fileinput$.attr('id') + '_hidden').val('');
 
+
         // если это изображение - то отображаем превью
         if (!!e.target.files[0].name.split('.').pop().toLowerCase().match(/^(jpg|gif|bmp|png|jpeg)$/)) {
             output$.attr('src', URL.createObjectURL(event.target.files[0]));
@@ -40,6 +41,9 @@ $(document).ready(function () {
             $('#myModal').modal();
             $('.js-edit', wrapper$).show();
 
+        } else {
+            $('.uploaded', wrapper$).hide();
+            $('.filename', wrapper$).html(e.target.files[0].name);
         }
 
         $('.js-del', wrapper$).show();
@@ -79,6 +83,9 @@ $(document).ready(function () {
         img$.attr('src', img$.data('src'));
         $('.js-del', wrapper$).hide();
         $('.js-edit', wrapper$).hide();
+        img$.show();
+        if ($('.filename', wrapper$).length) $('.filename', wrapper$).html('');
+
     });
 
 
@@ -137,7 +144,7 @@ $(document).ready(function () {
 
 
         $(".modal-fullscreen").on('show.bs.modal', function () {
-            setTimeout( function() {
+            setTimeout(function () {
                 $(".modal-backdrop").addClass("modal-backdrop-fullscreen");
             }, 0);
         });
@@ -146,8 +153,159 @@ $(document).ready(function () {
         });
 
 
+    };
+
+
+    $('.js_video_del').on('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        var $target = $(e.target),
+            $wraper = $target.parents('.js-video-url-input');
+
+        $('input', $wraper).val('');
+        $('.video_thumb', $wraper).attr('src', window.element_add_path + '/img/upload_05.jpg');
+        $target.hide();
+
+        return false;
+    });
+
+
+    $.fn.VideoInput = function () {
+        var $el = $(this),
+            t = this,
+            video_id,
+            video_service;
+
+        $('.js-video-url-input').on('click', function (e) {
+            var $line_row = $(e.target).parents('.media_border');
+            t.input = $('input', $line_row);
+
+            video_id = '';
+            video_service = '';
+            if (!t.input.val().length) {
+                $('#myModalVideo .js-video-url').val('');
+                $('#myModalVideo iframe').remove();
+            } else {
+                $('#myModalVideo .js-video-url').val(t.input.val());
+            }
+
+
+            $('#myModalVideo').modal();
+        });
+
+        $('.js-check', $el).on('click', function (e) {
+            var $target = $(e.target),
+                $input_url = $('.js-video-url', $el),
+                url = $input_url.val().replace(/^http[s]:\/\//, '');
+
+            $input_url.val(url);
+
+
+            var $form_group = $target.parents('.form-group'),
+                $modal_body = $target.parents('.modal-body');
+
+            if ($('iframe', $modal_body).length) {
+                $('iframe', $modal_body).remove();
+            }
+
+            if (url.match(/youtube/)) {
+
+
+                video_service = 'youtube';
+                if (url.split('v=').length > 1) {
+                    video_id = url.split('v=')[1];
+                } else {
+                    return 0;
+                }
+
+
+                var ampersandPosition = video_id.indexOf('&');
+                if (ampersandPosition != -1) {
+                    video_id = video_id.substring(0, ampersandPosition);
+                }
+
+
+                $form_group.after('<iframe width="' + $form_group.outerWidth() + '" height="' + $form_group.outerWidth() * 0.7 +
+                    '" src="https://www.youtube.com/embed/' + video_id + '" frameborder="0" allowfullscreen></iframe>')
+
+            } else if (url.match(/vimeo/)) {
+                video_service = 'vimeo';
+
+                video_id = url.match(/(?:www\.)?vimeo.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)(\d+)(?:$|\/|\?)/).pop();
+
+                $form_group.after('<iframe width="' + $form_group.outerWidth() + '" height="' + $form_group.outerWidth() * 0.7 +
+                    '" src="https://player.vimeo.com/video/' + video_id + '" frameborder="0" allowfullscreen></iframe>');
+
+            } else if (url.match(/rutube/)) {
+                video_service = 'rutube';
+                video_id = url.match(/(?:www\.)?rutube.ru\/(?:video\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)([0-9a-fA-F]+)(?:$|\/|\?)/).pop();
+
+                $.ajax({
+                    type: 'GET',
+                    url: 'http://rutube.ru/api/oembed/?url=https://rutube.ru/video/' + video_id + '/&format=jsonp',
+                    jsonp: 'callback',
+                    dataType: 'jsonp',
+                    success: function (data) {
+                        var iframe = $(data.html).attr('width', $form_group.outerWidth()).attr('height', $form_group.outerWidth() * 0.7);
+                        $form_group.after(iframe);
+                    }
+                });
+            }
+
+
+        });
+
+
+        $('.js-apply', $el).on('click', function (e) {
+
+            $('#myModalVideo .js-check').trigger('click');
+
+
+            var $target = $(e.target),
+                url = $('.js-video-url').val(),
+                $line_row = t.input.parents('.media_border');
+
+            t.input.val(url);
+
+
+            if (video_service == 'youtube') {
+                $('.video_thumb', $line_row).attr('src', 'https://img.youtube.com/vi/' + video_id + '/0.jpg');
+            } else if (video_service == 'vimeo') {
+                $.ajax({
+                    type: 'GET',
+                    url: 'http://vimeo.com/api/v2/video/' + video_id + '.json',
+                    jsonp: 'callback',
+                    dataType: 'jsonp',
+                    success: function (data) {
+                        var thumbnail_src = data[0].thumbnail_large;
+                        $('.video_thumb', $line_row).attr('src', thumbnail_src);
+                    }
+                });
+            } else if (video_service == 'rutube') {
+
+                $.ajax({
+                    type: 'GET',
+                    url: 'http://rutube.ru/api/oembed/?url=https://rutube.ru/video/' + video_id + '/&format=jsonp',
+                    jsonp: 'callback',
+                    dataType: 'jsonp',
+                    success: function (data) {
+                        var thumbnail_src = data.thumbnail_url;
+                        $('.video_thumb', $line_row).attr('src', thumbnail_src);
+                    }
+                });
+
+            }
+
+
+            $('.media_del', $line_row).show();
+
+        })
 
     };
+
+
+    $('#myModalVideo').VideoInput();
 
 
 });

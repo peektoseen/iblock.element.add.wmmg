@@ -261,6 +261,11 @@ if ($bAllowAccess) {
             }
         }
 
+        // обрабатываем свойство-видео
+        if ($arProperty["ID"] == $arParams['IBLOCK_VIDEO_PROPERTY']) {
+            $arProperty['PROPERTY_TYPE'] = 'VIDEO_URL';
+        }
+
 
         // добавляем ID совйства в PROPERTY_LIST,  если свойство имеется в PROPERTY_CODES
         if (in_array($arProperty["ID"], $arParams["PROPERTY_CODES"]) || $arProperty["ID"] == $arParams['IBLOCK_USER_LINK_INADD_PROPERTY']) {

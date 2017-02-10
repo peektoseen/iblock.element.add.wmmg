@@ -17,8 +17,8 @@ $asset->addJs($templateFolder . '/assets/js/bootstrap.min.js', true);
 $asset->addCss($templateFolder . '/assets/css/bootstrap.min.css');
 $asset->addCss($templateFolder . '/assets/css/darkroom.css');
 ?>
-<script type="text/javascript" src="<?=$templateFolder . '/assets/js/fabric.js'?>"></script>
-<script type="text/javascript" src="<?=$templateFolder . '/assets/js/darkroom.js'?>"></script>
+<script type="text/javascript" src="<?= $templateFolder . '/assets/js/fabric.js' ?>"></script>
+<script type="text/javascript" src="<?= $templateFolder . '/assets/js/darkroom.js' ?>"></script>
 <?
 
 if ((int)$arParams["ID"] > 0):?>
@@ -114,16 +114,14 @@ if ((int)$arParams["ID"] > 0):?>
                         ?>
                         <div class="line_row js-radiobutton <? if (!empty($arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'])): ?>property_<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'] ?><? else: ?>property_<?= $propertyID ?><? endif ?>">
                             <div class="line_dashed">
-                                <? $first = true; ?>
                                 <? foreach ($arResult["PROPERTY_LIST_FULL"][$propertyID]["ENUM"] as $id => $name): ?>
                                     <label class="custom-radio" for="property_<?= $propertyID ?>">
                                         <input name="PROPERTY[<?= $propertyID ?>][]"
-                                               value="<?= $id ?>" type="radio" <? if ($first): ?>checked<? endif ?>>
+                                               value="<?= $id ?>" type="radio">
                                         <div></div>
                                         <?= $name ?>
                                     </label>
                                     <div class="cleard"></div><br/>
-                                    <? $first = false; ?>
                                 <? endforeach ?>
                             </div> <!--<div class="line_dashed">-->
                         </div> <!--<div class="line_row">-->
@@ -320,35 +318,37 @@ if ((int)$arParams["ID"] > 0):?>
 
                         <div class="line_row <? if (!empty($arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'])): ?>property_<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]['CODE'] ?><? else: ?>property_<?= $propertyID ?><? endif ?>">
 
-                            <?
-
-                            for ($i = 0; $i < $inputNum; $i++) {
+                            <? for ($i = 0; $i < $inputNum; $i++) {
                                 $value = intval($propertyID) > 0 ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE"] : $arResult["ELEMENT"][$propertyID];
                                 ?>
-                                <div class="media_border js-file-input">
-                                    <img alt="" class="uploaded" src="<?= $templateFolder . '/img/upload_09.jpg' ?>"
-                                         data-src="<?= $templateFolder . '/img/upload_09.jpg' ?>">
+                                <div class="media_border js-file-input" style="display: flex;flex-direction: column; justify-content: center;">
+
+                                        <img alt="" class="uploaded" src="<?= $templateFolder . '/img/upload_09.jpg' ?>"
+                                             data-src="<?= $templateFolder . '/img/upload_09.jpg' ?>">
+
+                                    <div class="filename"></div>
+
 
                                     <div class="media_del js-del" style="display: none">
                                         <img alt="" src="<?= $templateFolder . '/img/icins_14.png' ?>">
                                     </div>
 
                                     <div class="media_edit js-edit" style="display: none">
-                                        <img alt="" src="<?= $templateFolder . '/img/1485436389_circle-edit-line.png' ?>">
+                                        <img alt=""
+                                             src="<?= $templateFolder . '/img/1485436389_circle-edit-line.png' ?>">
                                     </div>
 
 
-                                    <input type="hidden" id="<?=$this->GetEditAreaID('file_input'.$i.'_hidden')?>"
+                                    <input type="hidden" id="<?= $this->GetEditAreaID('file_input' . $i . '_hidden') ?>"
                                            name="PROPERTY[<?= $propertyID ?>][<?= $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] : $i ?>]"
                                            value="<?= $value ?>"/>
-                                    <input type="file" style="display: none;" id="<?=$this->GetEditAreaID('file_input'.$i)?>"
+                                    <input type="file" style="display: none;"
+                                           id="<?= $this->GetEditAreaID('file_input' . $i) ?>"
                                            size="<?= $arResult["PROPERTY_LIST_FULL"][$propertyID]["COL_COUNT"] ?>"
                                            name="PROPERTY_FILE_<?= $propertyID ?>_<?= $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] : $i ?>"/>
 
                                 </div>
-                                <?
-                            }
-                            ?>
+                            <? } ?>
                         </div> <!--<div class="line_row">-->
                         <?
                         break;
@@ -396,8 +396,12 @@ if ((int)$arParams["ID"] > 0):?>
                                         <div class="line_row_w50">
                                             <div class="line_row_header">
                                                 <h2 class="h2_s">
-                                                    Категория <img alt="" class="cp"
-                                                                   src="<?= $templateFolder . '/img/icins_06.png' ?>">
+                                                    Категория
+                                                    <? if (strlen($arParams['SECTION_HINT'])): ?>
+                                                        <img alt="" class="cp"
+                                                             src="<?= $templateFolder . '/img/icins_06.png' ?>"
+                                                             title="<?= $arParams['SECTION_HINT'] ?>">
+                                                    <? endif ?>
                                                 </h2><select name="PROPERTY[<?= $propertyID ?>][]" class="js-section">
                                                     <option value="0" selected>
                                                         Не установлено
@@ -415,8 +419,12 @@ if ((int)$arParams["ID"] > 0):?>
                                         <div class="line_row_w50 custom_01">
                                             <div class="line_row_header">
                                                 <h2 class="h2_s">
-                                                    Подкатегория <img alt="" class="cp"
-                                                                      src="<?= $templateFolder . '/img/icins_06.png' ?>">
+                                                    Подкатегория
+                                                    <? if (strlen($arParams['SUBSECTION_HINT'])) : ?>
+                                                        <img alt="" class="cp"
+                                                             title="<?= $arParams['SUBSECTION_HINT'] ?>"
+                                                             src="<?= $templateFolder . '/img/icins_06.png' ?>">
+                                                    <? endif ?>
                                                 </h2><select name="PROPERTY[<?= $propertyID ?>][]"
                                                              class="js-subsection">
                                                     <option value="0">
@@ -458,6 +466,39 @@ if ((int)$arParams["ID"] > 0):?>
 
                         endswitch;
                         break;
+                    case "VIDEO_URL":
+                        ?>
+
+                        <div class="line_row">
+                            <div class="line_border">
+                                <img align="absmiddle" alt="" src="<?= $templateFolder . '/img/icins_19.png' ?>">ДОБАВИТЬ
+                                <?= strtoupper($arResult["PROPERTY_LIST_FULL"][$propertyID]["NAME"]) ?>
+                            </div>
+                        </div>
+                        <div class="line_row">
+
+
+                            <? for ($i = 0; $i < $inputNum; $i++) {
+                                $value = intval($propertyID) > 0 ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE"] : $arResult["ELEMENT"][$propertyID];
+                                ?>
+                                <div class="media_border js-video-url-input">
+
+                                    <img class="video_thumb" src="<?= $templateFolder . '/img/upload_05.jpg' ?>">
+                                    <div class="media_del js_video_del">
+                                        <img alt="" src="<?= $templateFolder . '/img/icins_14.png' ?>">
+                                    </div>
+
+                                    <input type="hidden"
+                                           id="<?= $this->GetEditAreaID('video_input' . $i . '_hidden') ?>"
+                                           name="PROPERTY[<?= $propertyID ?>][<?= $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] ? $arResult["ELEMENT_PROPERTIES"][$propertyID][$i]["VALUE_ID"] : $i ?>]"
+                                           value="<?= $value ?>"/>
+                                </div>
+                            <? } ?>
+
+                        </div>
+
+                        <?
+                        break;
                 endswitch;
 
                 ?>
@@ -466,35 +507,6 @@ if ((int)$arParams["ID"] > 0):?>
             <? endforeach ?>
         <? endif ?>
 
-
-        <div class="line_row">
-            <div class="line_border">
-                <img align="absmiddle" alt="" src="<?= $templateFolder . '/img/icins_19.png' ?>">ДОБАВИТЬ ВИДЕО
-            </div>
-        </div>
-        <div class="line_row">
-            <div class="media_border">
-                <img alt="" class="uploaded" src="<?= $templateFolder . '/img/vetton.jpg' ?>">
-                <div class="media_video">
-                    <img alt="" src="<?= $templateFolder . '/img/icins_11.png' ?>">
-                </div>
-                <div class="media_del">
-                    <img alt="" src="<?= $templateFolder . '/img/icins_14.png' ?>">
-                </div>
-            </div>
-            <div class="media_border">
-                <img alt="" src="<?= $templateFolder . '/img/upload_05.jpg' ?>">
-                <div class="media_del">
-                    <img alt="" src="<?= $templateFolder . '/img/icins_14.png' ?>">
-                </div>
-            </div>
-            <div class="media_border">
-                <img alt="" src="<?= $templateFolder . '/img/upload_05.jpg' ?>">
-                <div class="media_del">
-                    <img alt="" src="<?= $templateFolder . '/img/icins_14.png' ?>">
-                </div>
-            </div>
-        </div>
 
 
         <? if ($arParams["USE_CAPTCHA"] == "Y" && $arParams["ID"] <= 0): ?>
@@ -544,7 +556,8 @@ if ((int)$arParams["ID"] > 0):?>
 <!-- Trigger the modal with a button -->
 
 <!-- Modal -->
-<div id="myModal" class="modal modal-fullscreen fade" tabindex="-1"  aria-labelledby="myModalLabel" aria-hidden="true" role="dialog">
+<div id="myModal" class="modal modal-fullscreen fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true"
+     role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
@@ -565,7 +578,47 @@ if ((int)$arParams["ID"] > 0):?>
 </div>
 
 
+<!-- Modal -->
+<div id="myModalVideo"
+     class="modal fade"
+     tabindex="-1"
+     aria-labelledby="myModalVideoLabel"
+     aria-hidden="true"
+     role="dialog">
+
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Добавить видео</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="urladdon">https://</span>
+                        <input class="form-control js-video-url" type="text" aria-describedby="urladdon"
+                               name="video_url">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default js-check" type="button">Проверить</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default js-apply" data-dismiss="modal">Принять</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
 <script type="text/javascript">
+    window.element_add_path = '<?=$templateFolder?>';
+
     $(function () {
         $('#<?=$this->GetEditAreaID('form')?>').FormAdd(
             {component: "<?=$component->getName()?>"}

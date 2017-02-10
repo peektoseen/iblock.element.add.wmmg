@@ -63,6 +63,17 @@ while($arProp = $rsUserLinkProperty->GetNext()){
     $arUserLinkProperty[$arProp["ID"]] = $arProp['NAME'];
 }
 
+
+$arVideoProperty = array();
+$rsVideoProperty = CIBlockProperty::GetList(array(), array('IBLOCK_ID'=>$arCurrentValues["IBLOCK_ID"], 'PROPERTY_TYPE'=>'S'));
+while($arProp = $rsVideoProperty->GetNext()){
+    $arVideoProperty[$arProp["ID"]] = $arProp['NAME'];
+}
+
+
+
+
+
 $arComponentParameters = array(
     "GROUPS" => array(
         "PARAMS" => array(
@@ -86,10 +97,17 @@ $arComponentParameters = array(
             "SORT" => "1000",
         ),
         "USER_LINK" => array(
-            //todo: вынести в lang
             "NAME" => "Привязка к пользователю",
             "SORT" => "2000",
         ),
+        "HINTS" => array(
+            "NAME" => "Подсказки для полей",
+            "SORT" => "1500"
+        ),
+        "VIDEO" => array(
+            "NAME" => "Видео",
+            "SORT" => "1500"
+        )
     ),
     "PARAMETERS" => array(
         "IBLOCK_TYPE" => array(
@@ -133,6 +151,14 @@ $arComponentParameters = array(
             "TYPE" => "LIST",
             "ADDITIONAL_VALUES" => "Y",
             "VALUES" => $arUserLinkProperty,
+        ),
+        "IBLOCK_VIDEO_PROPERTY" => array(
+            "PARENT" => "VIDEO",
+            //todo: в LANG
+            "NAME" => "Свойство для ссылки на видео",
+            "TYPE" => "LIST",
+            "ADDITIONAL_VALUES" => "N",
+            "VALUES" => $arVideoProperty,
         ),
         "IBLOCK_USER_LINK_INADD_PROPERTY" => array(
             "PARENT" => "USER_LINK",
@@ -215,6 +241,18 @@ $arComponentParameters["PARAMETERS"]["USE_JQUERY"] = array(
 $arComponentParameters["PARAMETERS"]["USER_MESSAGE_ADD"] = array(
     "PARENT" => "PARAMS",
     "NAME" => GetMessage("IBLOCK_USER_MESSAGE_ADD"),
+    "TYPE" => "TEXT",
+);
+
+$arComponentParameters["PARAMETERS"]["SECTION_HINT"] = array(
+    "PARENT" => "HINTS",
+    "NAME" => "Текст подсказки для категории",
+    "TYPE" => "TEXT",
+);
+
+$arComponentParameters["PARAMETERS"]["SUBSECTION_HINT"] = array(
+    "PARENT" => "HINTS",
+    "NAME" => "Текст подсказки для подкатегории",
     "TYPE" => "TEXT",
 );
 

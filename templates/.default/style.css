@@ -107,7 +107,8 @@ a:link {
     padding-right: 10px;
 }
 
-.line_row_header {}
+.line_row_header {
+}
 
 .h2_s {
     font-size: 14px;
@@ -171,6 +172,11 @@ a:link {
     width: 104px;
 }
 
+.media_border .video_thumb {
+    width: 100%;
+    height: auto;
+}
+
 .media_del {
     cursor: pointer;
     position: absolute;
@@ -217,7 +223,7 @@ label.custom-check input {
     display: none;
 }
 
-label.custom-check input+div {
+label.custom-check input + div {
     background: url(img/checkboxes.png) top center;
     width: 24px;
     height: 22px;
@@ -226,7 +232,7 @@ label.custom-check input+div {
     /* display: inline-block; */
 }
 
-label.custom-check input:checked+div {
+label.custom-check input:checked + div {
     background: url(img/checkboxes.png) bottom center;
 }
 
@@ -234,7 +240,7 @@ label.custom-radio input {
     display: none;
 }
 
-label.custom-radio input+div {
+label.custom-radio input + div {
     background: url(img/radio.png) top center;
     width: 24px;
     height: 22px;
@@ -243,7 +249,7 @@ label.custom-radio input+div {
     margin-top: -5px;
 }
 
-label.custom-radio input:checked+div {
+label.custom-radio input:checked + div {
     background: url(img/radio.png) bottom center;
 }
 
@@ -285,7 +291,7 @@ select {
     margin-top: 0px;
 }
 
-.custom_01> div {
+.custom_01 > div {
     padding-left: 45px;
     float: right;
     width: 80%;
@@ -310,7 +316,7 @@ label {
     left: 37%;
 }
 
-.uploaded+.media_del , .uploaded+.media_edit  {
+.uploaded + .media_del, .uploaded + .media_edit {
     display: block;
 }
 
@@ -341,20 +347,22 @@ label {
 .modal-fullscreen {
     background: transparent;
 }
+
 .modal-fullscreen .modal-content {
     background: transparent;
     border: 0;
     -webkit-box-shadow: none;
     box-shadow: none;
 }
+
 .modal-backdrop.modal-backdrop-fullscreen {
     background: #ffffff;
 }
+
 .modal-backdrop.modal-backdrop-fullscreen.in {
     opacity: .97;
     filter: alpha(opacity=97);
 }
-
 
 .modal-fullscreen .modal-dialog {
     margin: 0;
@@ -362,18 +370,29 @@ label {
     margin-left: auto;
     width: 100%;
 }
+
 @media (min-width: 768px) {
     .modal-fullscreen .modal-dialog {
         width: 750px;
     }
 }
+
 @media (min-width: 992px) {
     .modal-fullscreen .modal-dialog {
         width: 970px;
     }
 }
+
 @media (min-width: 1200px) {
     .modal-fullscreen .modal-dialog {
         width: 1170px;
     }
+}
+
+.darkroom-image-container > .canvas-container {
+    margin: 0 auto;
+}
+
+.modal-body img {
+    max-width: 100%;
 }
