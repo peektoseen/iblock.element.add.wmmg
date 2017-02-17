@@ -27,7 +27,8 @@ $arVirtualProperties = $arProperty_LNSF;
 $rsProp = CIBlockProperty::GetList(Array("sort" => "asc", "name" => "asc"), Array("ACTIVE" => "Y", "IBLOCK_ID" => $arCurrentValues["IBLOCK_ID"]));
 while ($arr = $rsProp->Fetch()) {
     $arProperty[$arr["ID"]] = "[" . $arr["CODE"] . "] " . $arr["NAME"];
-    if (in_array($arr["PROPERTY_TYPE"], array("L", "N", "S", "F"))) {
+
+    if (in_array($arr["PROPERTY_TYPE"], array("L", "N", "S", "F", "E"))) {
         $arProperty_LNSF[$arr["ID"]] = "[" . $arr["CODE"] . "] " . $arr["NAME"];
     }
 }
